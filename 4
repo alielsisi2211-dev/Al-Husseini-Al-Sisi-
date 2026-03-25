@@ -1,0 +1,38 @@
+const socket = io();
+const balanceDiv = document.getElementById('balance');
+const resultsDiv = document.getElementById('results');
+const messagesDiv = document.getElementById('messages');
+let myId;
+
+socket.on('updatePlayers', players => {
+    myId = socket.id;
+    balanceDiv.innerText = "رصيدك: " + players[myId].balance + " ج.م";
+});
+
+function playCrash() { socket.emit('playCrash'); }
+socket.on('crashResult', data => { resultsDiv.innerText = "Crash انتهت عند: " + data.multiplier + "x"; });
+
+function playSlots() { socket.emit('playSlots'); }
+socket.on('slotsResult', res => { resultsDiv.innerText = "Slots: " + res.join(' | '); });
+
+function playBlackjack() { socket.emit('playBlackjack'); }
+socket.on('blackjackResult', data => { 
+    resultsDiv.innerText = `Blackjack: انت ${data.playerScore} vs Dealer ${data.dealerScore} → ${data.result}`; 
+});
+
+function playPlinko() { socket.emit('playPlinko'); }
+socket.on('plinkoResult', win => { resultsDiv.innerText = "Plinko ربحت: " + win + "x"; });
+
+function betMatch() { socket.emit('betMatch', {amount:50, choice:"teamA"}); }
+
+// شات
+function sendMessage() {
+    let input = document.getElementById('chatInput');
+    let msg = input.value;
+    if(msg.trim() !== "") {
+        let p = document.createElement('p');
+        p.innerText = "أنت: " + msg;
+        messagesDiv.appendChild(p);
+        input.value = "";
+    }
+}

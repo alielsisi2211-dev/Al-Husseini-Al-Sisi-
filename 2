@@ -1,0 +1,54 @@
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+const PORT = process.env.PORT || 3000;
+app.use(express.static('public'));
+
+let players = {};
+
+io.on('connection', socket => {
+    players[socket.id] = {name: 'Player'+socket.id.slice(0,4), balance: 5000};
+    io.emit('updatePlayers', players);
+
+    socket.on('playCrash', () => {
+        let m = (Math.random()*3+1).toFixed(2);
+        socket.emit('crashResult', {multiplier: m});
+    });
+
+    socket.on('playSlots', () => {
+        const symbols = ['🍎','💎','🔔','7️⃣','🍒'];
+        let res = [symbols[Math.floor(Math.random()*symbols.length)],
+                   symbols[Math.floor(Math.random()*symbols.length)],
+                   symbols[Math.floor(Math.random()*symbols.length)]];
+        socket.emit('slotsResult', res);
+    });
+
+    socket.on('playBlackjack', () => {
+        let playerScore = Math.floor(Math.random()*21)+1;
+        let dealerScore = Math.floor(Math.random()*21)+1;
+        let result = (playerScore > dealerScore) ? "فوز" : (playerScore < dealerScore) ? "خسارة" : "تعادل";
+        socket.emit('blackjackResult', {playerScore, dealerScore, result});
+    });
+
+    socket.on('playPlinko', () => {
+        const multipliers = [0.2,0.5,1,2,5];
+        let win = multipliers[Math.floor(Math.random()*multipliers.length)];
+        socket.emit('plinkoResult', win);
+    });
+
+    socket.on('betMatch', data => {
+        let win = Math.random() < 0.5;
+        if(win) players[socket.id].balance += data.amount*2;
+        else players[socket.id].balance -= data.amount;
+        io.emit('updatePlayers', players);
+    });
+
+    socket.on('disconnect', () => {
+        delete players[socket.id];
+        io.emit('updatePlayers', players);
+    });
+});
+
+http.listen(PORT, () => console.log(`Server running on port ${PORT}`));
