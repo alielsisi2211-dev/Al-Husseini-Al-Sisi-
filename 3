@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Casino Pro Online</title>
+<link rel="stylesheet" href="style.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<h1>Casino Pro Online</h1>
+<div id="balance"></div>
+
+<div class="games">
+    <button onclick="playCrash()">🚀 Crash</button>
+    <button onclick="playSlots()">🎰 Slots</button>
+    <button onclick="playBlackjack()">🃏 Blackjack</button>
+    <button onclick="playPlinko()">🔵 Plinko</button>
+    <button onclick="betMatch()">⚽ رهانات ماتش</button>
+</div>
+
+<div id="results"></div>
+
+<div id="chat">
+    <input id="chatInput" placeholder="اكتب رسالة..." />
+    <button onclick="sendMessage()">أرسل</button>
+    <div id="messages"></div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
